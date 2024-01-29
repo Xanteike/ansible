@@ -1,0 +1,40 @@
+- name: Install PHP
+  yum: 
+    name: 
+      - php 
+      - php-json 
+      - php-mbstring 
+      - php-mysqli
+    state: latest
+
+- name: Set PHP session lifetime  
+  lineinfile:
+    path: /etc/php.ini 
+    regexp: '^session.gc_maxlifetime'
+    line: 'session.gc_maxlifetime = 86400'
+
+- name: Set session GC probability
+  lineinfile: 
+    path: /etc/php.ini
+    regexp: '^session.gc_probability'
+    line: 'session.gc_probability = 10'
+
+- name: Set session location
+  lineinfile: 
+    path: /etc/php.ini
+    regexp: '^;session.save_path = "/tmp"'
+    line: 'session.save_path = "/var/www/site.ru/sessions"'
+
+- name: Set max upload size
+  lineinfile:
+    path: /etc/php.ini
+    regexp: '^upload_max_filesize' 
+    line: 'upload_max_filesize = 64M'
+
+- name: copy files 
+  copy:
+    src: "roles/php/.htaccess"
+    dest: "/var/www/{{ item }}/html"
+  loop:
+    - site.ru
+    - site2.ru

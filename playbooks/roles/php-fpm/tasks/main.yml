@@ -1,0 +1,17 @@
+- name: Install php-fpm
+  yum:
+    name: 
+      - php-fpm
+    state: latest
+
+- name: Import config file
+  copy:
+    src: "roles/php-fpm/www.conf" 
+    dest: "/etc/php-fpm.d/www.conf"
+    owner: nginx
+    group: nginx
+
+- name: Reload php-fpm
+  systemd:
+    name: php-fpm
+    state: reloaded

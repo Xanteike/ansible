@@ -1,0 +1,7 @@
+- name: Downdload setup file
+  get_url:
+    url: https://www.1c-bitrix.ru/download/scripts/bitrixsetup.php
+    dest: "{{ site_root }}/{{ site_name }}/html/bitrixsetup.php"
+    owner: nginx
+    group: nginx
+    mode: 0777

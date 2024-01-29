@@ -1,0 +1,56 @@
+- name: Install Nginx
+  yum: 
+    name: nginx
+    state: latest  
+
+- name: Dir for site.ru
+  copy: 
+    src: "/usr/share/nginx/{{ item }}"
+    dest: "/var/www/site.ru/"
+  loop:
+    - html
+    - modules
+
+- name: Dir for site2.ru
+  copy: 
+    src: "/usr/share/nginx/{{ item }}"
+    dest: "/var/www/site2.ru/"
+  loop:
+    - html
+    - modules
+
+- name: Copy site configs  
+  copy:
+    src: "roles/nginx/{{ item }}" 
+    dest: "/etc/nginx/conf.d/{{ item }}"
+  loop:
+    - site.ru.conf
+    - site2.ru.conf
+
+- name: Hosts file update
+  lineinfile:
+    path: "/etc/hosts"
+    line: "{{ item }}"
+  loop: 
+    - "127.0.0.1   site.ru"
+    - "127.0.0.1   site2.ru"
+
+- name: Copy nginx configs  
+  copy:
+    src: "roles/nginx/nginx.conf" 
+    dest: "/etc/nginx/nginx.conf"
+    owner: nginx
+    group: nginx
+
+- name: Create .log files for site.ru
+  file:
+    path: "/var/www/site.ru/logs{{ item }}"
+    state: touch
+  with_items:
+    - nginx.log
+    - nginx-error.log
+
+- name: nginx reload
+  systemd:
+    name: nginx
+    state: reloaded 

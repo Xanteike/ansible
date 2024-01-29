@@ -1,0 +1,60 @@
+- name: Create site.ru user
+  user:
+    name: site.ru
+
+- name: Create platform directory
+  file:
+    path: "{{ site_root }}/{{ site_name }}"
+    state: directory 
+
+- name: Create directories for logs and sessions
+  file:
+    path: "{{ site_root }}/{{ site_name }}/{{ item }}"
+    state: directory
+    owner: nginx
+    group: nginx
+  loop:
+    - sessions
+    - logs
+
+- name: Nginx role
+  include_role:
+    name: nginx
+
+- name: Apache role
+  include_role:
+    name: apache
+
+- name: PHP role
+  include_role:
+    name: php
+
+- name: MySQL role
+  include_role: 
+    name: mysql
+  
+- name: Bitrix role
+  include_role:
+    name: bitrix
+
+- name: Check site availability
+  uri:
+    url: "http://site.ru/"
+    status_code: 200
+  register: site_status
+  ignore_errors: True
+
+- name: Print site status
+  debug: 
+    var: site_status
+
+- name: Check availability of Bitrix setup
+  uri:
+    url: http://site.ru/bitrixsetup.php
+    status_code: 200
+  register: result
+  ignore_errors: True
+
+- name: Debug result
+  debug:
+    msg: "Bitrix setup page {{ 'available' if result.status == 200 else 'not available' }}"

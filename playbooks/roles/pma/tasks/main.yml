@@ -1,0 +1,24 @@
+- name: Unpacking phpMyAdmin Source
+  unarchive:
+    src: "https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip"
+    dest: /var/www/
+    remote_src: yes
+    creates: /var/www/phpMyAdmin-5.2.1-all-languages/
+    owner: nginx
+    group: nginx
+    mode: 0755
+
+- name: Rename + move PMA
+  command: "mv /var/www/phpMyAdmin-5.2.1-all-languages/ /var/www/phpmyadmin/"
+
+- name: Create symlink for phpMyAdmin
+  file:
+    src: /var/www/phpmyadmin/index.php
+    dest: "{{ item }}"
+    state: link
+  loop: 
+    - /var/www/site.ru/html/index.php
+    - /var/www/site2.ru/html/index.php 
+
+
+

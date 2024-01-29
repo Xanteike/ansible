@@ -1,0 +1,38 @@
+
+- name: Install Apache
+  dnf:
+    name: httpd
+    state: latest
+
+- name: Enable MPM module 
+  lineinfile:
+    path: "/etc/httpd/conf.modules.d/00-mpm.conf"
+    regexp: '^#LoadModule mpm_prefork_module modules/mod_mpm_prefork.so'
+    line: 'LoadModule mpm_prefork_module modules/mod_mpm_prefork.so'
+
+# - name: Copy apache configs  
+#   copy:
+#     src: "roles/apache/site.ru.conf" 
+#     dest: "/etc/httpd/conf.d"
+
+# - name: Copy httpd configs file  
+#   copy:
+#     src: "roles/apache/httpd.conf" 
+#     dest: "/etc/httpd/conf/httpd.conf"
+
+# - name: Limit max clients
+#   lineinfile: 
+#     path: "/etc/httpd/conf/httpd.conf"
+#     regexp: '^MaxClients'
+#     line: MaxClients 25
+
+
+# - name: Access .svn and .git  
+#   lineinfile:
+#     path: "/etc/httpd/conf/httpd.conf"
+#     line: 'RedirectMatch 404 /\\.(svn|git|hg|bzr|cvs)(/|$)' 
+
+- name: Restart Apache
+  systemd: 
+    name: httpd 
+    state: reloaded

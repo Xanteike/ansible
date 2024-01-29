@@ -1,0 +1,70 @@
+- name: Install MySQL
+  yum: 
+    name: 
+      - mysql-server
+      - mariadb-connector-c-config
+      - mecab
+      - mysql
+      - mysql-common
+      - mysql-errmsg
+      - protobuf-lite
+    state: latest
+
+- name: mysql enable
+  systemd:
+    name: mysqld
+    enabled: yes
+
+- name: Install py packet 
+  pip:
+    name:
+      - PyMySQL  
+
+- name: Add phpMyAdmin database
+  community.mysql.mysql_db:
+    name: phpmyadmin
+    state: present
+
+- name: Create MySQL user for phpMyAdmin
+  mysql_user:
+    name: "{{ mysql_phpmyadmin_user }}"
+    password: "{{ mysql_phpmyadmin_password }}"
+    host: localhost
+    priv: '*.*:SELECT,INSERT,UPDATE,DELETE'
+    state: present
+
+- name: Add phpMyAdmin database privileges
+  community.mysql.mysql_user:
+    name: "{{ mysql_phpmyadmin_user }}"
+    priv: 'phpmyadmin.*:ALL'
+    append_privs: yes
+    state: present
+
+- name: Set query cache size  
+  lineinfile:
+    path: /etc/my.cnf
+    regexp: '^query_cache_size'
+    line: query_cache_size = 32M
+
+- name: Set temp table size
+  lineinfile: 
+    path: /etc/my.cnf
+    regexp: '^tmp_table_size'
+    line: tmp_table_size = 50M
+    
+- name: Set thread cache size
+  lineinfile:
+    path: /etc/my.cnf
+    regexp: '^thread_cache_size'
+    line: thread_cache_size = 25
+  
+- name: Enable innodb_file_per_table
+  lineinfile:
+    path: /etc/my.cnf
+    regexp: '^innodb_file_per_table' 
+    line: innodb_file_per_table = 1
+
+- name: Restart MySQL
+  systemd:
+    name: mysqld
+    state: restarted

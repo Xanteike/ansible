@@ -1,0 +1,17 @@
+- hosts: local
+  vars:
+    site_root: /var/www
+    site_name: site.ru
+    mysql_phpmyadmin_user: phpmyadmin
+    mysql_phpmyadmin_password: securepassword
+    
+  roles:
+  - role: site1   
+  - role: site2  
+    vars:
+      site_name: site2.ru
+  - role: pma
+    vars:
+      pma_alias: true
+
+  

@@ -1,0 +1,27 @@
+- name: Create a site directory
+  file:
+    path: "{{ site_root }}{{ site_name }}"
+    state: directory
+
+- name: Create directories for sessions and logs
+  file:
+    path: "{{ site_root }}/{{ site_name }}/{{ item }}"
+    state: directory
+    owner: nginx
+    group: nginx  
+  loop:  
+    - sessions
+    - logs
+
+- name: Create .log files for site2.ru
+  file:
+    path: "/var/www/site2.ru/logs{{ item }}"
+    state: touch
+  with_items:
+    - nginx.log
+    - nginx-error.log
+
+- name: PHP role
+  include_role:
+    name: php
+
